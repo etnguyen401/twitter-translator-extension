@@ -1,0 +1,36 @@
+{
+    "manifest_version": 3,
+    "name": "Twitter Translator",
+    "version": "1.0",
+    "description": "Translate tweets on Twitter to your preferred language.",
+    "icons": {
+        "16": "icons/translation_16.png",
+        "24": "icons/translation_24.png",
+        "32": "icons/translation_32.png",
+        "64": "icons/translation_64.png",
+        "128": "icons/translation_128.png"
+    },
+    "permissions": [
+        "storage",
+        "tabs"
+    ],
+    "host_permissions": [
+        "https://translate.google.com/"
+    ],
+    "background": {
+        "service_worker": "scripts/background.js"
+    },
+    "content_scripts": [
+        {
+            "matches": [
+                "https://twitter.com/*",
+                "https://x.com/*"
+            ],
+            "js": [
+                "scripts/content.js"
+            ],
+            "run_at": "document_end"
+        }
+    ]
+
+}
