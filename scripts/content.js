@@ -1,6 +1,7 @@
 let nativeLangs = ['en', 'und'];
 let targetNode = null;
 let observer = null;
+let intervalId = null;
 chrome.runtime.onMessage.addListener((msg, sender, response) => {
     //if url changed, need to select new section
     if (msg.type === 'URL_CHANGE') {
@@ -12,8 +13,12 @@ chrome.runtime.onMessage.addListener((msg, sender, response) => {
             observer.disconnect();
             observer = null;
         }
+        if (intervalId) {
+            clearInterval(intervalId);
+            intervalId = null;
+        }
 
-        const intervalId = setInterval(() => {
+        intervalId = setInterval(() => {
             console.log("Inside setInterval")
             if (!targetNode) {
                 targetNode = document.querySelector('section > div > div[style^="position: relative"]');
@@ -33,6 +38,7 @@ chrome.runtime.onMessage.addListener((msg, sender, response) => {
                                     //check if that div's lang is not in nativeLangs
                                     if (langDiv && !nativeLangs.includes(langDiv.getAttribute('lang'))) {
                                         console.log("Found foreign lang div:", langDiv); 
+                                        console.log("Text content:", langDiv.textContent);
                                     }
                                 });
                             }
@@ -43,6 +49,7 @@ chrome.runtime.onMessage.addListener((msg, sender, response) => {
                     targetNode.querySelectorAll('div[lang]').forEach(node => {
                         if (!nativeLangs.includes(node.getAttribute('lang'))) {
                             console.log("Found foreign lang div (initial):", node);
+                            console.log("Text content:", node.textContent);
                         }
                     });
                     //create mutation observer, will take over and detect new nodes
@@ -52,6 +59,7 @@ chrome.runtime.onMessage.addListener((msg, sender, response) => {
                     observer.observe(targetNode, options);
                     
                     clearInterval(intervalId);
+                    intervalId = null;
                     console.log("Interval cleared");
                 }
             }
