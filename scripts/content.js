@@ -32,41 +32,18 @@ chrome.runtime.onMessage.addListener((msg, sender, response) => {
                         for (mutation of mutationList) {
                             if (mutation.addedNodes.length > 0) {
                                 // console.log("New mutation: ", mutation);
-                                mutation.addedNodes.forEach(async (node) => {
-                                    //for each node, find descendent with lang attribute
-                                    let langDiv = node.querySelector('div[lang]');
-                                    //check if that div's lang is not in nativeLangs
-                                    if (langDiv && !nativeLangs.includes(langDiv.getAttribute('lang'))) {
-                                        console.log("Found foreign lang div:", langDiv); 
-                                        console.log("Text content:", langDiv.textContent);
-                                        //send to background.js for translation
-                                        //CHANGE FROM HARD CODE TARGET LATER
-                                        if (langDiv.textContent.length > 0) {
-                                            try {
-                                                const response = await chrome.runtime.sendMessage({
-                                                type: "TRANSLATE_TEXT",
-                                                text: langDiv.textContent,
-                                                source: langDiv.getAttribute("lang"),
-                                                target: "en"
-                                            });
-                                            console.log("Received translation response:", response);
-                                            } catch (error) {
-                                                console.error("Error during translation request:", error);
-                                            }
-                                        }
-                                        //get the response, erase existing text and insert translated text
-                                    }
+                                mutation.addedNodes.forEach((node) => {
+                                    //find descendent with lang attribute
+                                    const langDiv = node.querySelector("div[lang]");
+                                    createTranslatedNode(langDiv);
                                 });
                             }
                         }
                     }
                     //targetNode exists, so view existing nodes:
                     //can probably refactor this into a function so above can use as well
-                    targetNode.querySelectorAll("div[lang]").forEach(node => {
-                        if (!nativeLangs.includes(node.getAttribute("lang"))) {
-                            console.log("Found foreign lang div (initial):", node);
-                            console.log("Text content:", node.textContent);
-                        }
+                    targetNode.querySelectorAll("div[lang]").forEach((node) => {
+                        createTranslatedNode(node);
                     });
                     //create mutation observer, will take over and detect new nodes
                     observer = new MutationObserver(callback);
@@ -84,4 +61,37 @@ chrome.runtime.onMessage.addListener((msg, sender, response) => {
         
     }
 });
-console.log("test5");
+
+async function createTranslatedNode(langDiv) {
+    
+    //check if that div's lang is not in nativeLangs
+    if (langDiv && !nativeLangs.includes(langDiv.getAttribute("lang"))) {
+        
+        if (langDiv.textContent.length > 0) {
+            try {
+                const response = await chrome.runtime.sendMessage({
+                    type: "TRANSLATE_TEXT",
+                    text: langDiv.textContent,
+                    source: langDiv.getAttribute("lang"),
+                    target: "en"
+                });
+
+                console.log("Translation response:", response);
+                const span = document.createElement("span");
+                span.classList.add("css-1jxf684", "r-bcqeeo", "r-1ttztb7", "r-qvutc0", "r-poiln3");
+                
+                if (response.success) {
+                    span.textContent = `\n\nTranslation:\n${response.translatedText}`;
+                }
+                else {
+                    span.textContent = `\n\nTranslation:\nError ${response.status}: ${response.error}`;
+                }
+
+                langDiv.appendChild(span);
+
+            } catch (error) {
+                console.error("Error during translation request:", error);
+            }
+        }
+    }
+}
