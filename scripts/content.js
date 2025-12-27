@@ -1,4 +1,4 @@
-let nativeLangs = ["en", "und"];
+let nativeLangs = ["en", "ht", "und", "qam", "qct", "qht", "qme", "qmn", "qmx", "qmv", "qmw", "qmx", "qst", "zxx"];
 let targetNode = null;
 let observer = null;
 let intervalId = null;
@@ -25,23 +25,46 @@ chrome.runtime.onMessage.addListener((msg, sender, response) => {
                 if (targetNode) {
                     console.log("Target Node:", targetNode);
                     //make options
-                    const options = {childList: true};
+                    const options = {childList: true, subtree: true};
                     //make callback for mutation observer
                     const callback = function (mutationList, observer) {
                         //for each mutation, log for now
-                        for (mutation of mutationList) {
+                        for (const mutation of mutationList) {
+                            //if mutation is an added node
                             if (mutation.addedNodes.length > 0) {
-                                // console.log("New mutation: ", mutation);
+                                //for each added node
                                 mutation.addedNodes.forEach((node) => {
-                                    //find descendent with lang attribute
-                                    const langDiv = node.querySelector("div[lang]");
-                                    createTranslatedNode(langDiv);
+                                    //if the added node has data-testid = cellInnerDiv, it's a new tweet
+                                    if (node.getAttribute && node.getAttribute("data-testid") === "cellInnerDiv") {
+                                        //run the translated node creation
+                                        const langDiv = node.querySelector("div[lang]");
+                                        createTranslatedNode(langDiv);
+                                    }
+                                }); 
+                            }
+                            //else if mutation is a removed node
+                            else if (mutation.removedNodes.length > 0) {
+                                //for each removed node
+                                mutation.removedNodes.forEach((node) => {
+                                    //when user clicks show original text 
+                                    //if the removed node matches <div class="css-175oi2r r-1awozwy r-18u37iz r-z5qs1h r-e683xz r-1s2bzr4">,
+                                    //the div that has the show original text button, remake the translated node as twitter reloads the tweet
+                                    if (node.classList.contains("r-z5qs1h")) {
+                                        const langDiv = mutation.target.querySelector("div[lang]");
+                                        createTranslatedNode(langDiv);
+                                    }
+                                    //if the show more text was clicked and there already is translated text, remake the translated node with all text
+                                    else if (node.getAttribute("data-testid") === "tweet-text-show-more-link"
+                                            && mutation.target.querySelector(".translated-text")) {
+                                            const langDiv = mutation.target.querySelector("div[lang]");
+                                            mutation.target.querySelector(".translated-text").remove();
+                                            createTranslatedNode(langDiv);
+                                    }
                                 });
                             }
                         }
                     }
-                    //targetNode exists, so view existing nodes:
-                    //can probably refactor this into a function so above can use as well
+                    //targetNode loaded already, so translate for existing nodes if needed:
                     targetNode.querySelectorAll("div[lang]").forEach((node) => {
                         createTranslatedNode(node);
                     });
@@ -56,9 +79,7 @@ chrome.runtime.onMessage.addListener((msg, sender, response) => {
                     console.log("Interval cleared");
                 }
             }
-        }, 500);
-        
-        
+        }, 600);  
     }
 });
 
@@ -66,7 +87,7 @@ async function createTranslatedNode(langDiv) {
     
     //check if that div's lang is not in nativeLangs
     if (langDiv && !nativeLangs.includes(langDiv.getAttribute("lang"))) {
-        
+
         if (langDiv.textContent.length > 0) {
             try {
                 const response = await chrome.runtime.sendMessage({
@@ -76,9 +97,8 @@ async function createTranslatedNode(langDiv) {
                     target: "en"
                 });
 
-                console.log("Translation response:", response);
                 const span = document.createElement("span");
-                span.classList.add("css-1jxf684", "r-bcqeeo", "r-1ttztb7", "r-qvutc0", "r-poiln3");
+                span.classList.add("css-1jxf684", "r-bcqeeo", "r-1ttztb7", "r-qvutc0", "r-poiln3", "translated-text");
                 
                 if (response.success) {
                     span.textContent = `\n\nTranslation:\n${response.translatedText}`;
@@ -90,7 +110,7 @@ async function createTranslatedNode(langDiv) {
                 langDiv.appendChild(span);
 
             } catch (error) {
-                console.error("Error during translation request:", error);
+                console.error("Error during translation node creation:", error);
             }
         }
     }

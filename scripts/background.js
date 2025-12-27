@@ -31,7 +31,7 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
             });
 
             const data = await response.json();
-            
+
             if (!response.ok) {
 
                 sendResponse({
