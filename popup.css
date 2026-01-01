@@ -9,9 +9,10 @@ body {
   display: flex; 
   flex-direction: column;
   align-items: center;
-  padding: 50px 200px;
   background-color: #dce8f9;
   color: black;
+  width: 350px;
+  height: 540px;
 }
 
 .dropdown {

@@ -76,6 +76,7 @@ chrome.runtime.onMessage.addListener((msg, sender, response) => {
                     }
                     //targetNode loaded already, so translate for existing nodes if needed:
                     targetNode.querySelectorAll("div[lang]").forEach((node) => {
+                        if (node.querySelector(".translated-text")) return;
                         createTranslatedNode(node);
                     });
                     //create mutation observer, will take over and detect new nodes
