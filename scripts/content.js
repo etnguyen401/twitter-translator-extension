@@ -1,7 +1,16 @@
-let nativeLangs = ["en", "ht", "und", "qam", "qct", "qht", "qme", "qmn", "qmx", "qmv", "qmw", "qmx", "qst", "zxx"];
+
+const nativeLangs = ["cy", "in", "ht", "und", "qam", "qct", "qht", "qme", "qmn", "qmx", "qmv", "qmw", "qmx", "qst", "zxx"];
+
+let targetLanguage = "en"; //(en)
+chrome.storage.sync.get("targetLanguage", (storage) => {
+    targetLanguage = storage.targetLanguage.slice(-3, -1);
+    nativeLangs.push(targetLanguage);
+})
+
 let targetNode = null;
 let observer = null;
 let intervalId = null;
+
 chrome.runtime.onMessage.addListener((msg, sender, response) => {
     //if url changed, need to select new section
     if (msg.type === "URL_CHANGE") {
@@ -35,7 +44,8 @@ chrome.runtime.onMessage.addListener((msg, sender, response) => {
                                 //for each added node
                                 mutation.addedNodes.forEach((node) => {
                                     //if the added node has data-testid = cellInnerDiv, it's a new tweet
-                                    if (node.getAttribute && node.getAttribute("data-testid") === "cellInnerDiv") {
+                                    if (node.getAttribute && node.getAttribute("data-testid") === "cellInnerDiv"
+                                        && !node.querySelector(".translated-text")) {
                                         //run the translated node creation
                                         const langDiv = node.querySelector("div[lang]");
                                         createTranslatedNode(langDiv);
@@ -94,7 +104,7 @@ async function createTranslatedNode(langDiv) {
                     type: "TRANSLATE_TEXT",
                     text: langDiv.textContent,
                     source: langDiv.getAttribute("lang"),
-                    target: "en"
+                    target: targetLanguage,
                 });
 
                 const span = document.createElement("span");
