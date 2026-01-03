@@ -3,34 +3,46 @@
 <html lang="en">
     <head>
         <title> Twitter Translator Extension </title>
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
         <link rel="stylesheet" href="popup.css">
+        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
     </head>
 
     <body>
         <header>
-            <h2> Twitter Translator Extension </h2>
+            <div class="left-side-header">
+                <img src="icons/translation_24.png" alt="Translation Icon">
+                <h2> Twitter Translator </h2>
+            </div>
+            
         </header>
 
         <main>
-            <p> <strong>Enter your preferred language: </strong></p>
-            <div class="dropdown">
-                <!-- display currently selected value -->
-                <div class="selected-item">
-                    <input type="text" name="" id="" value="Select" readonly id="">
-                </div>
-                <div class="dropdown-content">
-                    <div class="search-input">
-                        <!-- user types search text here to filter options-->
-                        <input type="text" name="" id="">
+            <div class="line-container">
+                <div id="line"></div>
+            </div>
+            <div class="options">
+                <div class="option-row">
+                    <p> Enter your preferred language: </p>
+                    <div class="dropdown">
+                        <!-- display currently selected value -->
+                        <div class="selected-item">
+                            <input type="text" name="" id="" value="Select" readonly id="">
+                        </div>
+                        <div class="dropdown-content">
+                            <div class="search-input">
+                                <!-- user types search text here to filter options-->
+                                <input type="text" name="" id="">
+                            </div>
+                            <ul class="options-list">
+                                <!-- display list of all options -->
+                            </ul>
+                        </div>
                     </div>
-                    <ul class="options-list">
-                        <!-- display list of all options -->
-                        <!-- <li class="dropdown-item active">Select </li> -->
-                    </ul>
                 </div>
             </div>
-
-            <p>LOREM IPSUM AL;SDKJFALSDFJLAS;DFJ;LASKDJFL;KASDJFL</p>
+            
         </main>
         <script src="popup.js"></script>
     </body>
