@@ -50,82 +50,82 @@ const uniqueTargetLanguages = [
     "Vietnamese (vi)"
 ];
 
-//set selected language from storage
-let selectedLanguage = "";
-chrome.storage.sync.get("targetLanguage", (storage) => {
-    selectedLanguage = storage.targetLanguage;
-    const selectedItemInput = document.querySelector(".selected-item input");
-    selectedItemInput.value = selectedLanguage;
+//fill dropdown with options
+const optionsList = document.querySelector(".options-list");
+for (const language of uniqueTargetLanguages) {
+    const option = document.createElement("li");
+    option.classList.add("dropdown-item");
+    option.textContent = language;
+    optionsList.appendChild(option);
+}
 
-    //fill dropdown with options
-    const optionsList = document.querySelector(".options-list");
-    for (const language of uniqueTargetLanguages) {
-        const option = document.createElement("li");
-        option.classList.add("dropdown-item");
-        option.textContent = language;
-
-        if (language === selectedLanguage) {
-            option.classList.add("active");
-        }
-        optionsList.appendChild(option);
-    }
-
-    //handle selecting item from dropdown
-    const dropdownItems = document.querySelectorAll(".dropdown-item");
-
-    dropdownItems.forEach(dropdownItem => {
-        dropdownItem.addEventListener("click", () => {
-            dropdownItems.forEach(item => {
-                item.classList.remove("active");
-            })
-            dropdownItem.classList.add("active");
-
-            const selectedItemInput = document.querySelector(".selected-item input");
-            selectedItemInput.value = dropdownItem.innerHTML;
-            closeDropdown();
-
-            //store selected language in chrome storage
-            chrome.storage.sync.set({
-                targetLanguage: dropdownItem.innerHTML,
-            }); 
-            reloadTwitterTabs();
+//handle selecting item from dropdown
+const dropdownItems = document.querySelectorAll(".dropdown-item");
+dropdownItems.forEach(dropdownItem => {
+    dropdownItem.addEventListener("click", () => {
+        dropdownItems.forEach(item => {
+            item.classList.remove("active");
         })
-    });
+        dropdownItem.classList.add("active");
 
-    //handle filtering items from search input
-    const searchInput = document.querySelector(".search-input input");
-    searchInput.addEventListener("keyup", () => {
-        const filter = searchInput.value.toLocaleLowerCase();
+        const selectedItemInput = document.querySelector(".selected-item input");
+        selectedItemInput.value = dropdownItem.innerHTML;
+        closeDropdown();
 
-        dropdownItems.forEach(dropdownItem => {
-            if (dropdownItem.innerHTML.toLocaleLowerCase().startsWith(filter)) {
-                dropdownItem.classList.remove("hide");
-            }
-            else {
-                dropdownItem.classList.add("hide");
-            }
-        })
-    });
+        //store selected language in chrome storage
+        chrome.storage.sync.set({
+            targetLanguage: dropdownItem.innerHTML,
+        }); 
+        reloadTwitterTabs();
+    })
 });
 
-//control the click on dropdown
-window.addEventListener("load", () => {
-    window.addEventListener("click", (e) => {
-        //handle clicking inside/outside dropdown
-        const dropdown = document.querySelector(".dropdown");
-        const dropdownContent = document.querySelector(".dropdown-content");
-        const selectedItem = document.querySelector(".selected-item");
-        
-        if (dropdown.classList.contains("active")) {
-            if (!dropdownContent.contains(e.target)) {
-                closeDropdown();
-            }
+//handle filtering items from search input
+const searchInput = document.querySelector(".search-input input");
+searchInput.addEventListener("keyup", () => {
+    const filter = searchInput.value.toLocaleLowerCase();
+
+    dropdownItems.forEach(dropdownItem => {
+        if (dropdownItem.innerHTML.toLocaleLowerCase().startsWith(filter)) {
+            dropdownItem.classList.remove("hide");
         }
-        else if (selectedItem.contains(e.target)) {
-            openDropdown();
+        else {
+            dropdownItem.classList.add("hide");
         }
     })
 });
+
+//control the click on dropdown
+window.addEventListener("click", (e) => {
+    //handle clicking inside/outside dropdown
+    const dropdown = document.querySelector(".dropdown");
+    const dropdownContent = document.querySelector(".dropdown-content");
+    const selectedItem = document.querySelector(".selected-item");
+    
+    if (dropdown.classList.contains("active")) {
+        if (!dropdownContent.contains(e.target)) {
+            closeDropdown();
+        }
+    }
+    else if (selectedItem.contains(e.target)) {
+        openDropdown();
+    }
+});
+
+//set selected language from storage
+chrome.storage.sync.get("targetLanguage", (storage) => {
+    const selectedLanguage = storage.targetLanguage;
+    if (selectedLanguage) {
+        const selectedItemInput = document.querySelector(".selected-item input");
+        selectedItemInput.value = selectedLanguage;
+        dropdownItems.forEach(item => {
+            if (item.innerHTML === selectedLanguage) {
+                item.classList.add("active");
+            }
+        });
+    }
+});
+
 
 function openDropdown() {
     const dropdown = document.querySelector(".dropdown");
