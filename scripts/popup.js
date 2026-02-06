@@ -50,6 +50,9 @@ const uniqueTargetLanguages = [
     "Vietnamese (vi)"
 ];
 
+// document.querySelector('.options').addEventListener('click', (e) => {
+    
+// })
 //fill dropdown with options
 const optionsList = document.querySelector(".options-list");
 for (const language of uniqueTargetLanguages) {

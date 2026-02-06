@@ -10,19 +10,25 @@ header {
     flex-direction: row;
     justify-content: space-between;
     align-items: center;
-    padding: 4px;
+    padding: 20px 20px 0px 20px;
 }
 
 .left-side-header {
     display: flex;
     align-items: center;
     vertical-align: bottom;
-    gap: 4px;
+    gap: 8px;
+}
+
+.left-side-header img {
+    width: 32px;
+    height: 32px;
 }
 
 .left-side-header h2 {
     font-size: 20px;
     font-weight: 800;
+    color: white;
 }
 
 #line {
@@ -31,10 +37,8 @@ header {
     border-radius: 100px;
 }
 
-
 body {
-    background-color: #dce8f9;
-    color: black;
+    background: linear-gradient(135deg, #3885f0 0%, #c490df 100%);
     width: 350px;
     height: 540px;
     display: flex; 
@@ -43,29 +47,30 @@ body {
 
 .options {
     background-color: rgba(255, 255, 255, 0.5);
-    border-radius: 16px;
-    margin: 20px auto 0 auto;
+    border-radius: 20px;
+    margin: 16px auto 0 auto;
     height: 400px;
     width: 90%;
     display: flex;
     flex-direction: column;
-    font-size: 0.8rem;
+    font-size: 14px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
 }
 
 .option-row {
     display: flex;
-    flex-direction: row;
+    flex-direction: column;
     align-items: center;
     padding: 12px 20px;
-    justify-content: space-between;
+    gap: 12px;
 }
 
 main label {
-  font-weight: 600;
+    font-weight: 600;
 }
 
 .dropdown {
-    width: 132px;
+    width: 100%;
     position: relative;
 }
 
@@ -73,9 +78,18 @@ main label {
     width: 100%;
     outline: none;
     font-family: inherit;
-    border: 1px solid rgb(41, 75, 196);
-    border-radius: 8px;
-    padding: 3px 5px;
+    border: 2px solid #a6abb0;
+    border-radius: 12px;
+    padding: 8px 12px;
+    font-weight: 500;
+    background: #ffffff;
+    transition: all 0.5s ease;
+}
+
+.dropdown input:hover,
+.dropdown input:focus {
+    border-color: #667eea;
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
 }
 
 .dropdown .selected-item {
@@ -84,14 +98,18 @@ main label {
 
 .dropdown .selected-item::after {
     content: "";
-    width: 3px;
-    height: 3px;
+    width: 4px;
+    height: 4px;
     border: 2px solid;
     border-color: transparent rgb(41, 75, 196) rgb(41, 75, 196) transparent;
     position: absolute;
     top: 50%;
     right: 10px;
     transform: translateY(-70%) rotate(45deg);
+}
+
+.dropdown.active .selected-item::after {
+    transform: translateY(-10%) rotate(-135deg);
 }
 
 .dropdown .selected-item,
