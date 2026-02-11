@@ -38,22 +38,23 @@ header {
 }
 
 body {
-    background: linear-gradient(135deg, #3885f0 0%, #c490df 100%);
+    background: linear-gradient(135deg, #718cfe 0%, #fe8ec0 100%);
     width: 350px;
     height: 540px;
-    display: flex; 
+    display: flex;
+    color: #5a4e7c;
     flex-direction: column;
 }
 
 .options {
-    background-color: rgba(255, 255, 255, 0.5);
+    background-color: rgba(255, 255, 255, 0.6);
     border-radius: 20px;
     margin: 16px auto 0 auto;
     height: 400px;
     width: 90%;
     display: flex;
     flex-direction: column;
-    font-size: 14px;
+    font-size: 16px;
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
 }
 
@@ -83,13 +84,13 @@ main label {
     padding: 8px 12px;
     font-weight: 500;
     background: #ffffff;
-    transition: all 0.5s ease;
+    transition: all 0.3s ease;
 }
 
 .dropdown input:hover,
 .dropdown input:focus {
-    border-color: #667eea;
-    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    border-color: #98a9fb;
+    box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
 }
 
 .dropdown .selected-item {
@@ -115,19 +116,33 @@ main label {
 .dropdown .selected-item,
 .dropdown .selected-item input {
     cursor: pointer;
+    font-size: 14px;
 }
 
 .dropdown .dropdown-content {
-    border: none;
-    box-shadow: 0 5px 15px rgba(139, 136, 136, 0.3);
-    border-radius: 8px;
-    max-height: 143px;
+    border: 1px solid #e2e8f0;
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.3);
+    border-radius: 12px;
+    max-height: 250px;
     overflow: auto;
+    scrollbar-width: none;
     display: none;
     position: absolute;
     z-index: 99;
     background-color: rgb(255, 255, 255);
     width: 100%;
+    animation: slideDown 0.3s ease;
+}
+
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 .dropdown.active .dropdown-content {
@@ -135,16 +150,55 @@ main label {
 }
 
 .dropdown .dropdown-content .search-input {
-    padding: 5px;
+    padding: 12px;
+    border-bottom: 1px solid #e2e8f0;
+}
+
+.dropdown .dropdown-content .search-input input {
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    transition: all 0.3s ease;
+}
+
+.dropdown .dropdown-content .search-input input:hover,
+.dropdown .dropdown-content .search-input input:focus {
+    border-color: #98a9fb;
+    box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
+}
+
+.dropdown .dropdown-content .search-input input::placeholder {
+    color: #a6abb0;
 }
 
 .dropdown .dropdown-content ul {
     list-style: none;
+    max-height: 180px;
+    overflow-y: auto;
+}
+
+.dropdown .dropdown-content ul::-webkit-scrollbar {
+    width: 4px;
+}
+
+.dropdown .dropdown-content ul::-webkit-scrollbar-track {
+    background: #f1f5f9;
+    border-radius: 4px;
+}
+
+.dropdown .dropdown-content ul::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: 8px;
+}
+
+.dropdown .dropdown-content ul::-webkit-scrollbar-thumb:hover {
+    background: #94a3b8;
 }
 
 .dropdown .dropdown-content ul li {
-    padding: 2px 5px;
+    padding: 8px 12px;
     cursor: pointer;
+    font-size: 14px;
+    color: black;
 }
 
 .dropdown .dropdown-content ul li.hide {
@@ -158,4 +212,5 @@ main label {
 .dropdown .dropdown-content ul li.active {
     background-color: rgb(210, 217, 243);
     color: rgb(41, 75, 196);
+    font-weight: 800;
 }
