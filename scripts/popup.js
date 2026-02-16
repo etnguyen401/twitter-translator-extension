@@ -129,7 +129,6 @@ chrome.storage.sync.get("targetLanguage", (storage) => {
     }
 });
 
-
 function openDropdown() {
     const dropdown = document.querySelector(".dropdown");
     dropdown.classList.add("active");
