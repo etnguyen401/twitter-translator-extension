@@ -2,7 +2,7 @@ window.Storage = {
     async get(key) {
         return new Promise((resolve) => {
             chrome.storage.sync.get(key, (data) => {
-                resolve(data[key]);
+                resolve(data[key] ?? DEFAULT_PREFERENCES[key]);
             })
         });
     },
@@ -10,7 +10,7 @@ window.Storage = {
     async getAll() {
         return new Promise((resolve) => {
             chrome.storage.sync.get(null, (data) => {
-                resolve(data);
+                resolve(data ?? DEFAULT_PREFERENCES);
             })
         })
     },
