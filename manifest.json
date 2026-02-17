@@ -23,7 +23,7 @@
         "type": "module"
     },
     "action": {
-        "default_popup": "popup.html"
+        "default_popup": "popup/popup.html"
     },
     "content_scripts": [
         {
@@ -32,6 +32,8 @@
                 "https://x.com/*"
             ],
             "js": [
+                "utils/storage.js",
+                "utils/constants.js",
                 "scripts/content.js"
             ],
             "run_at": "document_end"

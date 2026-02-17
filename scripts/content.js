@@ -1,11 +1,11 @@
 
 const nativeLangs = ["cy", "in", "ht", "und", "qam", "qct", "qht", "qme", "qmn", "qmx", "qmv", "qmw", "qmx", "qst", "zxx"];
 
-let targetLanguage = "en";
-chrome.storage.sync.get("targetLanguage", (storage) => {
-    targetLanguage = storage.targetLanguage.slice(-3, -1);
+let targetLanguage = null;
+(async () => {
+    targetLanguage = (await Storage.get(STORAGE_KEYS.TARGET_LANGUAGE)).slice(-3, -1);
     nativeLangs.push(targetLanguage);
-})
+})();
 
 let targetNode = null;
 let observer = null;

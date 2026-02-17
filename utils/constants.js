@@ -1,11 +1,11 @@
 // default preferences
-export const DEFAULT_PREFERENCES = {
+const DEFAULT_PREFERENCES = {
     TARGET_LANGUAGE: "English (en)",
     TEXT_COLOUR: "#4606f5",
 };
 
 //storage keys
-export const STORAGE_KEYS = {
+const STORAGE_KEYS = {
     TARGET_LANGUAGE: "targetLanguage",
     TEXT_COLOUR: "textColour",
 };

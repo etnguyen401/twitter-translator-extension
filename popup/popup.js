@@ -65,7 +65,7 @@ for (const language of uniqueTargetLanguages) {
 //handle selecting item from dropdown
 const dropdownItems = document.querySelectorAll(".dropdown-item");
 dropdownItems.forEach(dropdownItem => {
-    dropdownItem.addEventListener("click", () => {
+    dropdownItem.addEventListener("click", async () => {
         dropdownItems.forEach(item => {
             item.classList.remove("active");
         })
@@ -75,10 +75,7 @@ dropdownItems.forEach(dropdownItem => {
         selectedItemInput.value = dropdownItem.innerHTML;
         closeDropdown();
 
-        //store selected language in chrome storage
-        chrome.storage.sync.set({
-            targetLanguage: dropdownItem.innerHTML,
-        }); 
+        await Storage.set(STORAGE_KEYS.TARGET_LANGUAGE, dropdownItem.innerHTML);
         reloadTwitterTabs();
     })
 });
@@ -115,9 +112,8 @@ window.addEventListener("click", (e) => {
     }
 });
 
-//set selected language from storage
-chrome.storage.sync.get("targetLanguage", (storage) => {
-    const selectedLanguage = storage.targetLanguage;
+(async function initializeSelectedLanguage() {
+    const selectedLanguage = await Storage.get(STORAGE_KEYS.TARGET_LANGUAGE);
     if (selectedLanguage) {
         const selectedItemInput = document.querySelector(".selected-item input");
         selectedItemInput.value = selectedLanguage;
@@ -127,7 +123,7 @@ chrome.storage.sync.get("targetLanguage", (storage) => {
             }
         });
     }
-});
+})();
 
 function openDropdown() {
     const dropdown = document.querySelector(".dropdown");
