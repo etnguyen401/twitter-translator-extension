@@ -82,7 +82,6 @@ function addDropdownLogic(element, options = {}) {
     function handleOpenClose(e) {
         if (element.classList.contains("active")) {
             if (!dropdownContent.contains(e.target)) {
-                console.log("Clicked on dropdown element itself, closing dropdown");
                 closeDropdown();
             }
         }
@@ -116,7 +115,6 @@ function addDropdownLogic(element, options = {}) {
     function attachEventListeners() {
         //event listener for clicking on dropdown options
         optionsList.addEventListener("click", (e) => {
-            console.log("Clicked on options list", e.target);
             if (e.target.classList.contains("dropdown-item")) {
                 handleItemSelect(e.target.textContent, true);
             }
@@ -131,7 +129,6 @@ function addDropdownLogic(element, options = {}) {
 
         //event listeners for clicking inside/outside dropdown
         window.addEventListener("click", (e) => {
-            console.log("Clicked inside/outside dropdown", e.target);
             handleOpenClose(e);
         })
 

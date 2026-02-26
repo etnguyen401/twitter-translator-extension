@@ -1,13 +1,13 @@
-// default preferences
-const DEFAULT_PREFERENCES = {
-    TARGET_LANGUAGE: "English (en)",
-    TEXT_COLOUR: "#4606f5",
-};
-
 //storage keys
 const STORAGE_KEYS = {
     TARGET_LANGUAGE: "targetLanguage",
     TEXT_COLOUR: "textColour",
+};
+
+// default preferences
+const DEFAULT_PREFERENCES = {
+    [STORAGE_KEYS.TARGET_LANGUAGE]: "English (en)",
+    [STORAGE_KEYS.TEXT_COLOUR]: "#4606f5",
 };
 
 const targetLanguages = [
