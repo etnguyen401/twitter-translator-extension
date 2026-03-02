@@ -19,7 +19,7 @@
         "http://localhost:5000/translate"
     ],
     "background": {
-        "service_worker": "scripts/background.js",
+        "service_worker": "dist/scripts/background.js",
         "type": "module"
     },
     "action": {
@@ -32,9 +32,7 @@
                 "https://x.com/*"
             ],
             "js": [
-                "utils/storage.js",
-                "utils/constants.js",
-                "scripts/content.js"
+                "dist/scripts/content.js"
             ],
             "run_at": "document_end"
         }

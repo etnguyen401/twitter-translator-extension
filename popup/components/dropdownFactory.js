@@ -1,4 +1,6 @@
-function addDropdownLogic(element, options = {}) {
+import { Storage } from "../../utils/storage.js";
+
+export function addDropdownLogic(element, options = {}) {
     if (!element) {
         console.warn("Element for dropdown logic not found.");
         return;

@@ -1,4 +1,6 @@
-window.Storage = {
+import { DEFAULT_PREFERENCES } from "./constants.js";
+
+export const Storage = {
     async get(key) {
         return new Promise((resolve) => {
             chrome.storage.sync.get(key, (data) => {

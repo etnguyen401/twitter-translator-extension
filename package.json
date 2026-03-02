@@ -1,0 +1,17 @@
+{
+  "name": "twitter-translator-extension",
+  "version": "1.0.0",
+  "description": "Twitter Translator is a simple chrome extension that automatically translates tweets into your target language as you scroll. The current implementation requires a self-hosted LibreTranslate API to function.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "esbuild scripts/background.js scripts/content.js popup/popup.js --bundle --outdir=dist", 
+    "watch": "esbuild scripts/background.js scripts/content.js popup/popup.js --bundle --outdir=dist --watch"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "esbuild": "^0.27.3"
+  }
+}

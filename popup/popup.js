@@ -1,3 +1,7 @@
+import { STORAGE_KEYS, MESSAGE_TYPES, targetLanguages } from "../utils/constants.js";
+import { Storage } from "../utils/storage.js";
+import { addDropdownLogic } from "./components/dropdownFactory.js";
+
 function reloadTwitterTabs() {
     chrome.tabs.query({currentWindow: true, url: "*://x.com/*"}, function(tabs) {
         tabs.forEach(tab => {
@@ -6,16 +10,51 @@ function reloadTwitterTabs() {
     });
 };
 
+function sendMsgToContentScript(type, data) {
+    chrome.tabs.query({currentWindow: true, url: "*://x.com/*"}, function(tabs) {
+        tabs.forEach(tab => {
+            chrome.tabs.sendMessage(tab.id, {
+                type: type, 
+                data: data
+            });
+        });
+    });
+};
+
 //add logic for color picker
 async function addColourPickerLogic() {
     
     const textColourInput = document.querySelector("#text-colour-select");
+    const colorValueText = document.querySelector(".color-value");
+
     //load saved colour from storage
-    const savedColour = await Storage.get(STORAGE_KEYS.TEXT_COLOUR);
-    console.log("Saved colour: ", savedColour);
-    if (savedColour) {
-        textColourInput.value = savedColour;
+    const textColour = await Storage.get(STORAGE_KEYS.TEXT_COLOUR);
+    console.log("Saved colour: ", textColour);
+    if (textColour) {
+        textColourInput.value = textColour;
+    } 
+
+    //update color value display on load
+    if (colorValueText) {
+        colorValueText.textContent = textColourInput.value;
     }
+
+    //update color value display
+    textColourInput.addEventListener("input", (e) => {
+        const colour = e.target.value;
+        if (colorValueText) {
+            colorValueText.textContent = colour;
+        }
+    })
+
+    //save to storage on change
+    textColourInput.addEventListener("change", async (e) => {
+        const colour = e.target.value;
+        await Storage.set(STORAGE_KEYS.TEXT_COLOUR, colour);
+        sendMsgToContentScript(MESSAGE_TYPES.COLOUR_CHANGE, colour);
+        reloadTwitterTabs();
+    });
+
 }
 
 document.addEventListener("DOMContentLoaded", () => {

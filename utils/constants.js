@@ -1,16 +1,22 @@
 //storage keys
-const STORAGE_KEYS = {
+export const STORAGE_KEYS = {
     TARGET_LANGUAGE: "targetLanguage",
     TEXT_COLOUR: "textColour",
 };
 
 // default preferences
-const DEFAULT_PREFERENCES = {
+export const DEFAULT_PREFERENCES = {
     [STORAGE_KEYS.TARGET_LANGUAGE]: "English (en)",
     [STORAGE_KEYS.TEXT_COLOUR]: "#4606f5",
 };
 
-const targetLanguages = [
+export const MESSAGE_TYPES = {
+    URL_CHANGE: "urlChange",
+    COLOUR_CHANGE: "colourChange",
+    TRANSLATE_TEXT: "translateText"
+}
+
+export const targetLanguages = [
     "Albanian (sq)",
     "Arabic (ar)",
     "Azerbaijani (az)",
@@ -61,7 +67,3 @@ const targetLanguages = [
     "Urdu (ur)",
     "Vietnamese (vi)"
 ];
-
-window.DEFAULT_PREFERENCES = DEFAULT_PREFERENCES;
-window.STORAGE_KEYS = STORAGE_KEYS;
-window.targetLanguages = targetLanguages;

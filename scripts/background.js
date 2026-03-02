@@ -3,17 +3,18 @@
 // const { text } = await translate('Привет мир');
 
 // console.log(text);
+import { MESSAGE_TYPES } from "../utils/constants.js";
 chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
     if (changeInfo.status === "complete") {
         chrome.tabs.sendMessage(tabId, {
             url: tab.url,
-            type: "URL_CHANGE"
+            type: MESSAGE_TYPES.URL_CHANGE
         });
     }
 });
 
 chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
-    if (msg.type !== "TRANSLATE_TEXT") return;
+    if (msg.type !== MESSAGE_TYPES.TRANSLATE_TEXT) return;
 
     (async () => {
         try {

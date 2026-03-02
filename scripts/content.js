@@ -1,3 +1,5 @@
+import { STORAGE_KEYS, MESSAGE_TYPES } from "../utils/constants.js";
+import { Storage } from "../utils/storage.js";
 
 const nativeLangs = ["cy", "in", "ht", "und", "qam", "qct", "qht", "qme", "qmn", "qmx", "qmv", "qmw", "qmx", "qst", "zxx"];
 
@@ -14,7 +16,7 @@ let intervalId = null;
 window.addEventListener("load", () => {
     chrome.runtime.onMessage.addListener((msg, sender, response) => {
         //if url changed, need to select new section
-        if (msg.type === "URL_CHANGE") {
+        if (msg.type === MESSAGE_TYPES.URL_CHANGE) {
             console.log("URL changed to: " + msg.url);
             targetNode = null;
             //select until page finished loading, in increments
@@ -108,7 +110,7 @@ async function createTranslatedNode(langDiv) {
         if (langDiv.textContent.length > 0) {
             try {
                 const response = await chrome.runtime.sendMessage({
-                    type: "TRANSLATE_TEXT",
+                    type: MESSAGE_TYPES.TRANSLATE_TEXT,
                     text: langDiv.textContent,
                     source: langDiv.getAttribute("lang"),
                     target: targetLanguage,
