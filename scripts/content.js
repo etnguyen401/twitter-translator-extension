@@ -18,13 +18,13 @@ window.addEventListener("load", () => {
         switch (msg.type) {
             case MESSAGE_TYPES.URL_CHANGE:
                 console.log("URL changed to: " + msg.url);
-                initialPageSetup(targetNode, observer, intervalId);
+                initialPageSetup();
                 break;                
         }
     });
 });
 
-function initialPageSetup(targetNode, observer, intervalId) {
+function initialPageSetup() {
     targetNode = null;
     //select until page finished loading, in increments
     //disconnect old observer
@@ -36,6 +36,9 @@ function initialPageSetup(targetNode, observer, intervalId) {
         clearInterval(intervalId);
         intervalId = null;
     }
+
+    //clear old translations if they exist
+    document.querySelectorAll(".translated-text").forEach(node => node.remove());
 
     intervalId = setInterval(() => {
         console.log("Inside setInterval")
