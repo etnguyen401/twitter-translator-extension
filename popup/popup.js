@@ -15,7 +15,7 @@ function sendMsgToContentScript(type, data) {
         tabs.forEach(tab => {
             chrome.tabs.sendMessage(tab.id, {
                 type: type, 
-                data: data
+                ...data
             });
         });
     });
@@ -51,8 +51,8 @@ async function addColourPickerLogic() {
     textColourInput.addEventListener("change", async (e) => {
         const colour = e.target.value;
         await Storage.set(STORAGE_KEYS.TEXT_COLOUR, colour);
-        sendMsgToContentScript(MESSAGE_TYPES.COLOUR_CHANGE, colour);
-        reloadTwitterTabs();
+        sendMsgToContentScript(MESSAGE_TYPES.COLOUR_CHANGE, { colour });
+        // reloadTwitterTabs();
     });
 
 }

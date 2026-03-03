@@ -2,11 +2,18 @@ import { STORAGE_KEYS, MESSAGE_TYPES } from "../utils/constants.js";
 import { Storage } from "../utils/storage.js";
 
 const nativeLangs = ["cy", "in", "ht", "und", "qam", "qct", "qht", "qme", "qmn", "qmx", "qmv", "qmw", "qmx", "qst", "zxx"];
-
+let settings = null;
 let targetLanguage = null;
 (async () => {
-    targetLanguage = (await Storage.get(STORAGE_KEYS.TARGET_LANGUAGE)).slice(-3, -1);
+    const settings = await Storage.getAll();
+    console.log("Loaded settings: ", settings);
+
+    
+    targetLanguage = settings.targetLanguage.slice(-3, -1);
     nativeLangs.push(targetLanguage);
+
+    //apply colour
+    applyTextColour(settings.textColour);
 })();
 
 let targetNode = null;
@@ -19,11 +26,34 @@ window.addEventListener("load", () => {
             case MESSAGE_TYPES.URL_CHANGE:
                 console.log("URL changed to: " + msg.url);
                 initialPageSetup();
-                break;                
+                break;         
+            case MESSAGE_TYPES.COLOUR_CHANGE:
+                console.log("Colour changed to: " + msg.colour);
+                applyTextColour(msg.colour);
+                break;
         }
     });
 });
 
+function applyTextColour(colour) {
+    //remove old colour
+    const oldStyle = document.getElementById("translation-text-colour");
+    if (oldStyle) {
+        oldStyle.remove();
+    }
+
+    //make style element and add css rules for tweets
+    const style = document.createElement("style");
+    style.id = "translation-text-colour";
+    style.textContent = `.translated-text {
+        color: ${colour} !important;
+    }`;
+
+    //add to document
+    document.head.appendChild(style);
+
+    console.log("Applied new text colour: ", colour);
+}
 function initialPageSetup() {
     targetNode = null;
     //select until page finished loading, in increments
