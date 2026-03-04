@@ -16,7 +16,8 @@ export const MESSAGE_TYPES = {
     URL_CHANGE: "urlChange",
     COLOUR_CHANGE: "colourChange",
     TRANSLATE_TEXT: "translateText",
-    FONT_CHANGE: "fontChange"
+    FONT_CHANGE: "fontChange",
+    LANGUAGE_CHANGE: "languageChange"
 }
 
 export const targetLanguages = [

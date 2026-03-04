@@ -64,7 +64,10 @@ document.addEventListener("DOMContentLoaded", () => {
             items: targetLanguages,
             placeholder: "Select a target language:",
             storageKey: STORAGE_KEYS.TARGET_LANGUAGE,
-            onChange: reloadTwitterTabs
+            onChange: (language) => {
+                const langCode = language.slice(-3, -1);
+                sendMsgToContentScript(MESSAGE_TYPES.LANGUAGE_CHANGE, { langCode });
+            }
         }
     ).init();
 

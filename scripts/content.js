@@ -1,7 +1,7 @@
 import { STORAGE_KEYS, MESSAGE_TYPES } from "../utils/constants.js";
 import { Storage } from "../utils/storage.js";
 
-const nativeLangs = ["cy", "in", "ht", "und", "qam", "qct", "qht", "qme", "qmn", "qmx", "qmv", "qmw", "qmx", "qst", "zxx"];
+let nativeLangs = ["cy", "in", "ht", "und", "qam", "qct", "qht", "qme", "qmn", "qmx", "qmv", "qmw", "qmx", "qst", "zxx"];
 let settings = null;
 let targetLanguage = null;
 (async () => {
@@ -34,6 +34,14 @@ window.addEventListener("load", () => {
             case MESSAGE_TYPES.FONT_CHANGE:
                 console.log("Font changed to: " + msg.font);
                 applyFont(msg.font);
+                break;
+            case MESSAGE_TYPES.LANGUAGE_CHANGE:
+                console.log("Language changed to: " + msg.langCode);
+                //find old language in nativeLangs and remove it
+                nativeLangs = nativeLangs.filter((lang) => lang !== targetLanguage);
+                targetLanguage = msg.langCode;
+                nativeLangs.push(targetLanguage);
+                initialPageSetup();
                 break;
         }
     });
