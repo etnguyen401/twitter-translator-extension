@@ -19,6 +19,8 @@ export function addDropdownLogic(element, options = {}) {
     const dropdownContent = element.querySelector('.dropdown-content');
     const selectedItem = element.querySelector('.selected-item');
 
+    // let selectedValue = null;
+
     //handle filling dropdown with options
     function fillDropdown() {
         if (!optionsList) {
@@ -51,29 +53,29 @@ export function addDropdownLogic(element, options = {}) {
 
     //use this function when clicking on dropdown item
     //and when initializing dropdown to set selected item from storage
-    async function handleItemSelect(targetText, saveToStorage) {
+    async function handleItemSelect(value, saveToStorage) {
 
         const dropdownItems = element.querySelectorAll(".dropdown-item");
 
         dropdownItems.forEach(item => {
             item.classList.remove("active");
-            if (item.textContent === targetText) {
+            if (item.textContent === value) {
                 item.classList.add("active");
             }
         });
 
         //update input display
         if (selectedItemInput) {
-            selectedItemInput.value = targetText;
+            selectedItemInput.value = value;
         }
 
         if (saveToStorage) {
-            await Storage.set(config.storageKey, targetText);
+            await Storage.set(config.storageKey, value);
         }
 
         //call onChange callback if provided
         if (config.onChange && saveToStorage) {
-            config.onChange();
+            config.onChange(value);
         }
 
         //close dropdown

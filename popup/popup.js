@@ -1,4 +1,4 @@
-import { STORAGE_KEYS, MESSAGE_TYPES, targetLanguages } from "../utils/constants.js";
+import { STORAGE_KEYS, MESSAGE_TYPES, targetLanguages, fonts } from "../utils/constants.js";
 import { Storage } from "../utils/storage.js";
 import { addDropdownLogic } from "./components/dropdownFactory.js";
 
@@ -65,6 +65,18 @@ document.addEventListener("DOMContentLoaded", () => {
             placeholder: "Select a target language:",
             storageKey: STORAGE_KEYS.TARGET_LANGUAGE,
             onChange: reloadTwitterTabs
+        }
+    ).init();
+
+    addDropdownLogic(
+        document.querySelector("#target-font-dropdown"),
+        {
+            items: fonts,
+            placeholder: "Select a target font:",
+            storageKey: STORAGE_KEYS.TARGET_FONT,
+            onChange: (font) => {
+                sendMsgToContentScript(MESSAGE_TYPES.FONT_CHANGE, { font });
+            }
         }
     ).init();
 

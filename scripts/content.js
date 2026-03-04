@@ -31,9 +31,35 @@ window.addEventListener("load", () => {
                 console.log("Colour changed to: " + msg.colour);
                 applyTextColour(msg.colour);
                 break;
+            case MESSAGE_TYPES.FONT_CHANGE:
+                console.log("Font changed to: " + msg.font);
+                applyFont(msg.font);
+                break;
         }
     });
 });
+
+function applyFont(font) {
+    //remove old font style
+    const oldStyle = document.getElementById("translation-text-font");
+    if (oldStyle) {
+        oldStyle.remove();
+    }
+
+    if (font === "Default") {
+        return;
+    }
+    
+    //make style element and add css rules for font
+    const style = document.createElement("style");
+    style.id = "translation-text-font";
+    style.textContent = `.translated-text {
+        font-family: ${font} !important;
+    }`;
+
+    //add to document
+    document.head.appendChild(style);
+}
 
 function applyTextColour(colour) {
     //remove old colour
@@ -51,8 +77,6 @@ function applyTextColour(colour) {
 
     //add to document
     document.head.appendChild(style);
-
-    console.log("Applied new text colour: ", colour);
 }
 function initialPageSetup() {
     targetNode = null;

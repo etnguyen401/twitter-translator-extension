@@ -23,11 +23,11 @@
             </div> -->
             <div class="options">
                 <div class="option-row">
-                    <label for="selected-item-input"> Enter your preferred language: </label>
+                    <label for="language-item-input"> Enter your preferred language: </label>
                     <div class="dropdown" id="target-language-dropdown">
                         <!-- display currently selected value -->
                         <div class="selected-item">
-                            <input type="text" id="" value="Select" readonly>
+                            <input type="text" id="language-item-input" value="Select" readonly>
                         </div>
                         <div class="dropdown-content">
                             <div class="search-input">
@@ -45,6 +45,21 @@
                     <div class ="colour-picker-container">
                         <input type="color" id="text-colour-select" name="text-colour-select" value="#000000">
                         <span class="color-value"></span>
+                    </div>
+                </div>
+                <div class="option-row">
+                    <label for="font-item-input"> Enter your preferred font: </label>
+                    <div class="dropdown" id="target-font-dropdown">
+                        <div class="selected-item">
+                            <input type="text" id="font-item-input" value="Select" readonly>
+                        </div>
+                        <div class="dropdown-content">
+                            <div class="search-input">
+                                <input type="text" name="" id="" placeholder="Search...">
+                            </div>
+                            <ul class="options-list">
+                            </ul>
+                        </div>
                     </div>
                 </div>
             </div>
