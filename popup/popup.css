@@ -143,6 +143,11 @@ main label {
     font-size: 14px;
 }
 
+.dropdown.flip-up .dropdown-content {
+    bottom: 100%;
+    top: auto;
+}
+
 .dropdown .dropdown-content {
     border: 1px solid #e2e8f0;
     box-shadow: 0 12px 40px rgba(0, 0, 0, 0.3);

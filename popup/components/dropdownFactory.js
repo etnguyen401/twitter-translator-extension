@@ -105,6 +105,22 @@ export function addDropdownLogic(element, options = {}) {
 
     function openDropdown() {
         element.classList.add("active");
+
+        //calc dropdown position
+        const rect = element.getBoundingClientRect();
+
+        //calc height of dropdown content
+        const contentHeight = dropdownContent.offsetHeight;
+
+        //calculate available space below and above dropdown
+        const spaceBelow = window.innerHeight - rect.bottom;
+        const spaceAbove = rect.top;
+
+        if (spaceBelow < contentHeight && spaceBelow < spaceAbove) {
+            element.classList.add("flip-up");
+        } else {
+            element.classList.remove("flip-up");
+        }
     }
 
     async function loadSelectedFromStorage() {
