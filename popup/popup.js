@@ -25,7 +25,7 @@ function sendMsgToContentScript(type, data) {
 async function addColourPickerLogic() {
     
     const textColourInput = document.querySelector("#text-colour-select");
-    const colorValueText = document.querySelector(".color-value");
+    const colorValueText = document.querySelector(".colour-value");
 
     //load saved colour from storage
     const textColour = await Storage.get(STORAGE_KEYS.TEXT_COLOUR);
