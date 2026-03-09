@@ -4,6 +4,57 @@ import { Storage } from "../utils/storage.js";
 let nativeLangs = ["cy", "in", "ht", "und", "qam", "qct", "qht", "qme", "qmn", "qmx", "qmv", "qmw", "qmx", "qst", "zxx"];
 let settings = null;
 let targetLanguage = null;
+
+//function to create a hash
+function createHash(str) {
+    let hash = 0;
+    for (const char of str) {
+        hash = (hash << 5) - hash + char.charCodeAt(0);
+        hash |= 0; // Convert to 32bit integer
+    }
+    return hash;
+}
+
+class LRUCache {
+
+    constructor(maxSize) {
+        this.maxSize = maxSize;
+        this.cache = new Map();
+    }
+
+    get(key) {
+        if (!this.cache.has(key)) {
+            return null;
+        }
+
+        const val = this.cache.get(key);
+        this.cache.delete(key);
+        this.cache.set(key, val);
+        return val;
+    }
+
+    set(key, val) {
+        if (this.cache.has(key)) {
+            this.cache.delete(key);
+        }
+
+        this.cache.set(key, val);
+
+        if (this.cache.size > this.maxSize) {
+            const firstKey = this.cache.keys().next().value;
+            this.cache.delete(firstKey);
+        }
+    }
+
+    clear() {
+        this.cache.clear();
+    }
+    
+}
+
+//create cache with max of 500
+const translationCache = new LRUCache(500);
+
 (async () => {
     const settings = await Storage.getAll();
     console.log("Loaded settings: ", settings);
@@ -42,6 +93,8 @@ window.addEventListener("load", () => {
                 targetLanguage = msg.langCode;
                 nativeLangs.push(targetLanguage);
                 initialPageSetup();
+                //clear cache
+                translationCache.clear();
                 break;
         }
     });
@@ -86,6 +139,7 @@ function applyTextColour(colour) {
     //add to document
     document.head.appendChild(style);
 }
+
 function initialPageSetup() {
     targetNode = null;
     //select until page finished loading, in increments
@@ -178,24 +232,40 @@ async function createTranslatedNode(langDiv) {
 
         if (langDiv.textContent.length > 0) {
             try {
-                const response = await chrome.runtime.sendMessage({
-                    type: MESSAGE_TYPES.TRANSLATE_TEXT,
-                    text: langDiv.textContent,
-                    source: langDiv.getAttribute("lang"),
-                    target: targetLanguage,
-                });
+                //check cache, if not in cache, send message to background to translate, then add to cache
+                const key = createHash(langDiv.textContent.substring(0, 100)); 
 
                 const span = document.createElement("span");
                 span.classList.add("css-1jxf684", "r-bcqeeo", "r-1ttztb7", "r-qvutc0", "r-poiln3", "translated-text");
                 
-                if (response.success) {
-                    span.textContent = `\n\nTranslation:\n${response.translatedText}`;
+                const start = performance.now();
+
+                if (cachedTranslation) {
+                    console.log("Translation from cache for: ", langDiv.textContent.substring(0, 100));
+                    console.log("Cached translation: ", cachedTranslation);
+                    span.textContent = `\n\nTranslation:\n${cachedTranslation}\nExecution time in seconds: ${(performance.now() - start) / 1000}`;
+
                 }
                 else {
-                    span.textContent = `\n\nTranslation:\nError ${response.status}: ${response.error}`;
-                }
+                    const response = await chrome.runtime.sendMessage({
+                        type: MESSAGE_TYPES.TRANSLATE_TEXT,
+                        text: langDiv.textContent,
+                        source: langDiv.getAttribute("lang"),
+                        target: targetLanguage,
+                    });
 
+                    if (response.success) {
+                        span.textContent = `\n\nTranslation:\n${response.translatedText}\nExecution time in seconds: ${(performance.now() - start) / 1000}`;
+                        //add to cache
+                        translationCache.set(key, response.translatedText);
+                    }
+                    else {
+                        span.textContent = `\n\nTranslation:\nError ${response.status}: ${response.error}\nExecution time in seconds: ${(performance.now() - start) / 1000}`;
+                    }
+                    
+                }
                 langDiv.appendChild(span);
+
 
             } catch (error) {
                 console.error("Error during translation node creation:", error);
