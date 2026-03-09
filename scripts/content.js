@@ -201,7 +201,7 @@ function initialPageSetup() {
                                         && mutation.target.querySelector(".translated-text")) {
                                         const langDiv = mutation.target.querySelector("div[lang]");
                                         mutation.target.querySelector(".translated-text").remove();
-                                        createTranslatedNode(langDiv);
+                                        createTranslatedNode(langDiv, true);
                                 }
                             });
                         }
@@ -226,7 +226,7 @@ function initialPageSetup() {
     }, 600);  
 }
 
-async function createTranslatedNode(langDiv) {
+async function createTranslatedNode(langDiv, isShowMore = false) {
     //check if that div's lang is not in nativeLangs
     if (langDiv && !nativeLangs.includes(langDiv.getAttribute("lang"))) {
 
@@ -234,17 +234,16 @@ async function createTranslatedNode(langDiv) {
             try {
                 //check cache, if not in cache, send message to background to translate, then add to cache
                 const key = createHash(langDiv.textContent.substring(0, 100)); 
-
+                const cachedTranslation = translationCache.get(key);
                 const span = document.createElement("span");
                 span.classList.add("css-1jxf684", "r-bcqeeo", "r-1ttztb7", "r-qvutc0", "r-poiln3", "translated-text");
                 
                 const start = performance.now();
-
-                if (cachedTranslation) {
+                //if it's cached and not a show more translation, use cached translation
+                if (cachedTranslation && !isShowMore) {
                     console.log("Translation from cache for: ", langDiv.textContent.substring(0, 100));
                     console.log("Cached translation: ", cachedTranslation);
                     span.textContent = `\n\nTranslation:\n${cachedTranslation}\nExecution time in seconds: ${(performance.now() - start) / 1000}`;
-
                 }
                 else {
                     const response = await chrome.runtime.sendMessage({
