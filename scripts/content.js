@@ -180,7 +180,8 @@ function initialPageSetup() {
                                     && !node.querySelector(".translated-text")) {
                                     //run the translated node creation
                                     const langDiv = node.querySelector("div[lang]");
-                                    createTranslatedNode(langDiv);
+                                    // createTranslatedNode(langDiv);
+                                    createTranslatedNode2(langDiv);
                                 }
                             }); 
                         }
