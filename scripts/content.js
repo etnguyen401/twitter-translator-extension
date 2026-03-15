@@ -328,8 +328,8 @@ async function createTranslatedNode2(langDiv, isShowMore = false) {
                     console.log("Handling special node at index: ", i);
                     const info = specialNodesInfo.get(i);
                     //if it's a IMG, just add the html to our span element
-                    if (info.type === "img") {
-                        console.log("Adding image node: ", info.html);
+                    if (info.type === "img" || info.type === "spacing") {
+                        console.log("Adding img/spacing node: ", info.html);
                         span.insertAdjacentHTML("beforeend", info.html);
                     }
                     else if (info.type === "link") {
@@ -337,7 +337,7 @@ async function createTranslatedNode2(langDiv, isShowMore = false) {
                         //if it's a link, we need to replace the text in the html with the translated text, then add to our span element
                         const tempDiv = document.createElement("div");
                         tempDiv.innerHTML = info.html;
-                        const linkNode = tempDiv.firstElementChild;
+                        const linkNode = tempDiv.firstElementChild.firstElementChild;
                         linkNode.firstChild.nodeValue = translatedText[i];
                         span.append(linkNode);
                     }
@@ -376,7 +376,7 @@ function extractText(div) {
                     //store index
                     const specialNodeInfo = {
                         // sub: sub,
-                        html: linkNode.outerHTML,
+                        html: node.outerHTML,
                         text: linkNode.textContent,
                         type: "link"
                     };
@@ -400,7 +400,17 @@ function extractText(div) {
                 };
                 specialNodesInfo.set(textToTranslate.length - 1, specialNodeInfo);
                 return;
-            }   
+            }
+            //if span has no text content, it's for spacing
+            else if (node.textContent.trim() === "") {
+                textToTranslate.push(node.textContent);
+                const specialNodeInfo = {
+                    html: node.outerHTML,
+                    type: "spacing"
+                };
+                specialNodesInfo.set(textToTranslate.length - 1, specialNodeInfo);
+                return;
+            }
 
             Array.from(node.childNodes).forEach(child => {
                 dfs(child);
