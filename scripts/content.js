@@ -59,12 +59,19 @@ const translationCache = new LRUCache(500);
     const settings = await Storage.getAll();
     console.log("Loaded settings: ", settings);
 
-    
     targetLanguage = settings.targetLanguage.slice(-3, -1);
     nativeLangs.push(targetLanguage);
 
     //apply colour
     applyTextColour(settings.textColour);
+
+    //add style for hovering over links
+    const style = document.createElement("style");
+    style.innerHTML = `
+    .translated-text a:hover {
+        text-decoration: underline !important;
+    }`;
+    document.head.appendChild(style);
 })();
 
 let targetNode = null;
