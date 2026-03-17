@@ -321,7 +321,7 @@ async function createTranslatedNode2(langDiv, isShowMore = false) {
                     translationCache.set(key, translatedText);
                 }
                 else {
-                    span.textContent = `\n\nTranslation:\nError ${response.status}: ${response.error}\nExecution time in seconds: ${(performance.now() - start) / 1000}`;
+                    span.textContent = `\n\nTranslation:\nError ${response.status}: ${response.error}`;
                     langDiv.appendChild(span);
                     return;
                 }
@@ -339,14 +339,22 @@ async function createTranslatedNode2(langDiv, isShowMore = false) {
                         console.log("Adding img/spacing node: ", info.html);
                         span.insertAdjacentHTML("beforeend", info.html);
                     }
-                    else if (info.type === "link") {
-                        console.log("Adding link node: ", info.html);
+                    else if (info.type === "link" || info.type === "text") {
+                        console.log("Adding link/text node: ", info.html);
                         //if it's a link, we need to replace the text in the html with the translated text, then add to our span element
+                        //link: tempdiv -> span -> a -> text node
+                        //text: tempdiv -> span -> text
                         const tempDiv = document.createElement("div");
                         tempDiv.innerHTML = info.html;
-                        const linkNode = tempDiv.firstElementChild.firstElementChild;
-                        linkNode.firstChild.nodeValue = translatedText[i];
-                        span.append(linkNode);
+                        let node = null;
+                        if (info.type === "link") {
+                            node = tempDiv.firstElementChild.firstElementChild;
+                        }
+                        else if (info.type === "text") {
+                            node = tempDiv.firstElementChild;
+                        }
+                        node.firstChild.nodeValue = translatedText[i];
+                        span.append(node);
                     }
                 }
                 else {
@@ -368,15 +376,14 @@ function extractText(div) {
 
     function dfs(node) {
 
-        if (node.nodeType === Node.TEXT_NODE) {
-            textToTranslate.push(node.textContent);
-            return;
-        }
-        else if (node.nodeType === Node.ELEMENT_NODE) {
+        // if (node.nodeType === Node.TEXT_NODE) {
+        //     textToTranslate.push(node.textContent);
+        //     return;
+        // }
+        if (node.nodeType === Node.ELEMENT_NODE) {
             //if span w/ a link
             if (node.classList.contains("r-18u37iz")) {
                 const linkNode = node.querySelector("a");
-
                 if (linkNode) {
                     // const sub = `[[__LINK${subIndex}__]]`;
                     textToTranslate.push(linkNode.textContent);
@@ -418,10 +425,19 @@ function extractText(div) {
                 specialNodesInfo.set(textToTranslate.length - 1, specialNodeInfo);
                 return;
             }
+            //if it's a span with text content
+            else {
+                textToTranslate.push(node.textContent);
+                const specialNodeInfo = {
+                    html: node.outerHTML,
+                    type: "text"
+                };
+                specialNodesInfo.set(textToTranslate.length - 1, specialNodeInfo);
+            }
 
-            Array.from(node.childNodes).forEach(child => {
-                dfs(child);
-            });
+            // Array.from(node.childNodes).forEach(child => {
+            //     dfs(child);
+            // });
         }
 
     }
