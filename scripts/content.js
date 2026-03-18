@@ -1,7 +1,7 @@
 import { STORAGE_KEYS, MESSAGE_TYPES } from "../utils/constants.js";
 import { Storage } from "../utils/storage.js";
 
-let nativeLangs = ["cy", "in", "ht", "und", "qam", "qct", "qht", "qme", "qmn", "qmx", "qmv", "qmw", "qmx", "qst", "zxx"];
+let nativeLangs = ["cy", "art", "in", "ht", "und", "qam", "qct", "qht", "qme", "qmn", "qmx", "qmv", "qmw", "qmx", "qst", "zxx"];
 let settings = null;
 let targetLanguage = null;
 
