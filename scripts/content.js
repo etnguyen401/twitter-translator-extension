@@ -349,6 +349,14 @@ async function createTranslatedNode2(langDiv, isShowMore = false) {
                         let node = null;
                         if (info.type === "link") {
                             node = tempDiv.firstElementChild.firstElementChild;
+                            //if the hashtag is missing, add it to the front
+                            if (!translatedText[i].startsWith("#")) {
+                                translatedText[i] = "#" + translatedText[i];
+                            }
+                            //if the translated text is too short, set the text to the original
+                            if (info.text.length * 0.3 > translatedText[i].length) {
+                                translatedText[i] = info.text;
+                            }
                         }
                         else if (info.type === "text") {
                             node = tempDiv.firstElementChild;
@@ -425,7 +433,9 @@ function extractText(div) {
                 specialNodesInfo.set(textToTranslate.length - 1, specialNodeInfo);
                 return;
             }
-            //if it's a span with text content
+            //if it's a span with text content,
+            //link to website/something else,
+            //@mention as well
             else {
                 textToTranslate.push(node.textContent);
                 const specialNodeInfo = {
