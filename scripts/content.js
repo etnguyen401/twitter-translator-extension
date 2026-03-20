@@ -5,56 +5,6 @@ let nativeLangs = ["cy", "art", "in", "ht", "und", "qam", "qct", "qht", "qme", "
 let settings = null;
 let targetLanguage = null;
 
-//function to create a hash
-function createHash(str) {
-    let hash = 0;
-    for (const char of str) {
-        hash = (hash << 5) - hash + char.charCodeAt(0);
-        hash |= 0; // Convert to 32bit integer
-    }
-    return hash;
-}
-
-class LRUCache {
-
-    constructor(maxSize) {
-        this.maxSize = maxSize;
-        this.cache = new Map();
-    }
-
-    get(key) {
-        if (!this.cache.has(key)) {
-            return null;
-        }
-
-        const val = this.cache.get(key);
-        this.cache.delete(key);
-        this.cache.set(key, val);
-        return val;
-    }
-
-    set(key, val) {
-        if (this.cache.has(key)) {
-            this.cache.delete(key);
-        }
-
-        this.cache.set(key, val);
-
-        if (this.cache.size > this.maxSize) {
-            const firstKey = this.cache.keys().next().value;
-            this.cache.delete(firstKey);
-        }
-    }
-
-    clear() {
-        this.cache.clear();
-    }
-    
-}
-
-//create cache with max of 500
-const translationCache = new LRUCache(500);
-
 (async () => {
     const settings = await Storage.getAll();
     console.log("Loaded settings: ", settings);
@@ -238,66 +188,66 @@ function initialPageSetup() {
     }, 600);  
 }
 
-async function createTranslatedNode(langDiv, isShowMore = false) {
-    //check if that div's lang is not in nativeLangs
-    if (langDiv && !nativeLangs.includes(langDiv.getAttribute("lang"))) {
+// async function createTranslatedNode(langDiv, isShowMore = false) {
+//     //check if that div's lang is not in nativeLangs
+//     if (langDiv && !nativeLangs.includes(langDiv.getAttribute("lang"))) {
 
-        if (langDiv.textContent.length > 0) {
-            try {
-                //check cache, if not in cache, send message to background to translate, then add to cache
-                const key = createHash(langDiv.textContent.substring(0, 100)); 
-                const cachedTranslation = translationCache.get(key);
-                const span = document.createElement("span");
-                span.classList.add("css-1jxf684", "r-bcqeeo", "r-1ttztb7", "r-qvutc0", "r-poiln3", "translated-text");
+//         if (langDiv.textContent.length > 0) {
+//             try {
+//                 //check cache, if not in cache, send message to background to translate, then add to cache
+//                 const key = createHash(langDiv.textContent.substring(0, 100)); 
+//                 const cachedTranslation = translationCache.get(key);
+//                 const span = document.createElement("span");
+//                 span.classList.add("css-1jxf684", "r-bcqeeo", "r-1ttztb7", "r-qvutc0", "r-poiln3", "translated-text");
                 
-                const start = performance.now();
-                //if it's cached and not a show more translation, use cached translation
-                if (cachedTranslation && !isShowMore) {
-                    console.log("Translation from cache for: ", langDiv.textContent.substring(0, 100));
-                    console.log("Cached translation: ", cachedTranslation);
-                    span.textContent = `\n\nTranslation:\n${cachedTranslation}\nExecution time in seconds: ${(performance.now() - start) / 1000}`;
-                }
-                else {
-                    const response = await chrome.runtime.sendMessage({
-                        type: MESSAGE_TYPES.TRANSLATE_TEXT,
-                        text: langDiv.textContent,
-                        source: langDiv.getAttribute("lang"),
-                        target: targetLanguage,
-                    });
+//                 const start = performance.now();
+//                 //if it's cached and not a show more translation, use cached translation
+//                 if (cachedTranslation && !isShowMore) {
+//                     console.log("Translation from cache for: ", langDiv.textContent.substring(0, 100));
+//                     console.log("Cached translation: ", cachedTranslation);
+//                     span.textContent = `\n\nTranslation:\n${cachedTranslation}\nExecution time in seconds: ${(performance.now() - start) / 1000}`;
+//                 }
+//                 else {
+//                     const response = await chrome.runtime.sendMessage({
+//                         type: MESSAGE_TYPES.TRANSLATE_TEXT,
+//                         text: langDiv.textContent,
+//                         source: langDiv.getAttribute("lang"),
+//                         target: targetLanguage,
+//                     });
 
-                    if (response.success) {
-                        span.textContent = `\n\nTranslation:\n${response.translatedText}\nExecution time in seconds: ${(performance.now() - start) / 1000}`;
-                        //add to cache
-                        translationCache.set(key, response.translatedText);
-                    }
-                    else {
-                        span.textContent = `\n\nTranslation:\nError ${response.status}: ${response.error}\nExecution time in seconds: ${(performance.now() - start) / 1000}`;
-                    }
+//                     if (response.success) {
+//                         span.textContent = `\n\nTranslation:\n${response.translatedText}\nExecution time in seconds: ${(performance.now() - start) / 1000}`;
+//                         //add to cache
+//                         translationCache.set(key, response.translatedText);
+//                     }
+//                     else {
+//                         span.textContent = `\n\nTranslation:\nError ${response.status}: ${response.error}\nExecution time in seconds: ${(performance.now() - start) / 1000}`;
+//                     }
                     
-                }
-                langDiv.appendChild(span);
+//                 }
+//                 langDiv.appendChild(span);
 
 
-            } catch (error) {
-                console.error("Error during translation node creation:", error);
-            }
-        }
-    }
-}
+//             } catch (error) {
+//                 console.error("Error during translation node creation:", error);
+//             }
+//         }
+//     }
+// }
 
 async function createTranslatedNode2(langDiv, isShowMore = false) {
     if (langDiv && !nativeLangs.includes(langDiv.getAttribute("lang"))) {
         //get extracted text
         try {
             const { textToTranslate, specialNodesInfo } = extractText(langDiv);
-            const textToTranslateJoined = textToTranslate.join("");
-            console.log("Text to translate: ", textToTranslate);
+            // const textToTranslateJoined = textToTranslate.join("");
+            // console.log("Text to translate: ", textToTranslate);
 
-            console.log("Special nodes info: ", specialNodesInfo);
-            //make cache key and check cache
+            // console.log("Special nodes info: ", specialNodesInfo);
+            // //make cache key and check cache
 
-            const key = createHash(textToTranslateJoined.substring(0, 100));
-            let translatedText = translationCache.get(key);
+            // const key = createHash(textToTranslateJoined.substring(0, 100));
+            // let translatedText = translationCache.get(key);
 
             //create span
             const span = document.createElement("span");
@@ -305,42 +255,55 @@ async function createTranslatedNode2(langDiv, isShowMore = false) {
             span.textContent = `\n\nTranslation:\n`;
             // const start = performance.now();
 
-            if (!translatedText || isShowMore) {
-                //call api to get list of translations
-                const response = await chrome.runtime.sendMessage({
-                    type: MESSAGE_TYPES.TRANSLATE_TEXT,
-                    text: textToTranslate,
-                    source: langDiv.getAttribute("lang"),
-                    target: targetLanguage,
-                });
+            // if (!translatedText || isShowMore) {
+            //     //call api to get list of translations
+            //     const response = await chrome.runtime.sendMessage({
+            //         type: MESSAGE_TYPES.TRANSLATE_TEXT,
+            //         text: textToTranslate,
+            //         source: langDiv.getAttribute("lang"),
+            //         target: targetLanguage,
+            //     });
 
-                if (response.success) {
-                    translatedText = response.translatedText;
-                    console.log("Translated text after API call:", translatedText);
-                    //add to cache
-                    translationCache.set(key, translatedText);
-                }
-                else {
-                    span.textContent = `\n\nTranslation:\nError ${response.status}: ${response.error}`;
-                    langDiv.appendChild(span);
-                    return;
-                }
+            //     if (response.success) {
+            //         translatedText = response.translatedText;
+            //         console.log("Translated text after API call:", translatedText);
+            //         //add to cache
+            //         translationCache.set(key, translatedText);
+            //     }
+            //     else {
+            //         span.textContent = `\n\nTranslation:\nError ${response.status}: ${response.error}`;
+            //         langDiv.appendChild(span);
+            //         return;
+            //     }
+            // }
+            const response = await chrome.runtime.sendMessage({
+                type: MESSAGE_TYPES.TRANSLATE_TEXT,
+                text: textToTranslate,
+                isShowMore: isShowMore,
+                source: langDiv.getAttribute("lang"),
+                target: targetLanguage,
+            });
+
+            if (!response.success) {
+                span.textContent = `\n\nTranslation:\nError ${response.status}: ${response.error}`;
+                langDiv.appendChild(span);
+                return;
             }
 
-            console.log("Translated text: ", translatedText);
+            // console.log("Translated text: ", response.translatedText);
             //loop over array of translated text
-            for (let i = 0; i < translatedText.length; i++) {
+            for (let i = 0; i < response.translatedText.length; i++) {
                 // Handle special nodes
                 if (specialNodesInfo.has(i)) {
-                    console.log("Handling special node at index: ", i);
+                    // console.log("Handling special node at index: ", i);
                     const info = specialNodesInfo.get(i);
                     //if it's a IMG, just add the html to our span element
                     if (info.type === "img" || info.type === "spacing") {
-                        console.log("Adding img/spacing node: ", info.html);
+                        // console.log("Adding img/spacing node: ", info.html);
                         span.insertAdjacentHTML("beforeend", info.html);
                     }
                     else if (info.type === "link" || info.type === "text") {
-                        console.log("Adding link/text node: ", info.html);
+                        // console.log("Adding link/text node: ", info.html);
                         //if it's a link, we need to replace the text in the html with the translated text, then add to our span element
                         //link: tempdiv -> span -> a -> text node
                         //text: tempdiv -> span -> text
@@ -350,24 +313,24 @@ async function createTranslatedNode2(langDiv, isShowMore = false) {
                         if (info.type === "link") {
                             node = tempDiv.firstElementChild.firstElementChild;
                             //if the hashtag is missing, add it to the front
-                            if (!translatedText[i].startsWith("#")) {
-                                translatedText[i] = "#" + translatedText[i];
+                            if (!response.translatedText[i].startsWith("#")) {
+                                response.translatedText[i] = "#" + response.translatedText[i];
                             }
                             //if the translated text is too short, set the text to the original
-                            if (info.text.length * 0.3 > translatedText[i].length) {
-                                translatedText[i] = info.text;
+                            if (info.text.length * 0.3 > response.translatedText[i].length) {
+                                response.translatedText[i] = info.text;
                             }
                         }
                         else if (info.type === "text") {
                             node = tempDiv.firstElementChild;
                         }
-                        node.firstChild.nodeValue = translatedText[i];
+                        node.firstChild.nodeValue = response.translatedText[i];
                         span.append(node);
                     }
                 }
                 else {
-                    console.log("Adding regular text: ", translatedText[i]);
-                    span.append(translatedText[i]);
+                    console.log("Adding regular text: ", response.translatedText[i]);
+                    span.append(response.translatedText[i]);
                 }
             }
             langDiv.appendChild(span);
