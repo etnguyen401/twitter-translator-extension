@@ -194,7 +194,6 @@ async function createTranslatedNode(langDiv, isShowMore = false) {
             const span = document.createElement("span");
             span.classList.add("css-1jxf684", "r-bcqeeo", "r-1ttztb7", "r-qvutc0", "r-poiln3", "translated-text");
             span.textContent = `\n\nTranslation:\n`;
-            const start = performance.now();
 
             const response = await chrome.runtime.sendMessage({
                 type: MESSAGE_TYPES.TRANSLATE_TEXT,
@@ -247,7 +246,6 @@ async function createTranslatedNode(langDiv, isShowMore = false) {
                     }
                 }
             }
-            span.append(`\nExecution time: ${(performance.now() - start) / 1000}`);
             langDiv.appendChild(span);
         } catch (error) {
             console.error("Error during translation node creation:", error);
