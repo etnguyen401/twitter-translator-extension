@@ -137,8 +137,7 @@ function initialPageSetup() {
                                     && !node.querySelector(".translated-text")) {
                                     //run the translated node creation
                                     const langDiv = node.querySelector("div[lang]");
-                                    // createTranslatedNode(langDiv);
-                                    createTranslatedNode2(langDiv);
+                                    createTranslatedNode(langDiv);
                                 }
                             }); 
                         }
@@ -152,16 +151,14 @@ function initialPageSetup() {
                                 //remake the translated node as twitter reloads the tweet
                                 if (node.classList.contains("r-z5qs1h")) {
                                     const langDiv = mutation.target.querySelector("div[lang]");
-                                    //createTranslatedNode(langDiv);
-                                    createTranslatedNode2(langDiv);
+                                    createTranslatedNode(langDiv);
                                 }
                                 //if the show more text was clicked and there already is translated text, remake the translated node with all text
                                 else if (node.getAttribute("data-testid") === "tweet-text-show-more-link"
                                         && mutation.target.querySelector(".translated-text")) {
                                         const langDiv = mutation.target.querySelector("div[lang]");
                                         mutation.target.querySelector(".translated-text").remove();
-                                        //createTranslatedNode(langDiv, true);
-                                        createTranslatedNode2(langDiv, true);
+                                        createTranslatedNode(langDiv, true);
                                 }
                             });
                         }
@@ -170,9 +167,8 @@ function initialPageSetup() {
                 //targetNode loaded already, so translate for existing nodes if needed:
                 targetNode.querySelectorAll("div[lang]").forEach((node) => {
                     if (node.querySelector(".translated-text")) return;
-                    // createTranslatedNode(node);
-                    createTranslatedNode2(node);
-                    // test(node);
+                    createTranslatedNode(node);
+
                 });
                 //create mutation observer, will take over and detect new nodes
                 observer = new MutationObserver(callback);
@@ -188,94 +184,18 @@ function initialPageSetup() {
     }, 600);  
 }
 
-// async function createTranslatedNode(langDiv, isShowMore = false) {
-//     //check if that div's lang is not in nativeLangs
-//     if (langDiv && !nativeLangs.includes(langDiv.getAttribute("lang"))) {
-
-//         if (langDiv.textContent.length > 0) {
-//             try {
-//                 //check cache, if not in cache, send message to background to translate, then add to cache
-//                 const key = createHash(langDiv.textContent.substring(0, 100)); 
-//                 const cachedTranslation = translationCache.get(key);
-//                 const span = document.createElement("span");
-//                 span.classList.add("css-1jxf684", "r-bcqeeo", "r-1ttztb7", "r-qvutc0", "r-poiln3", "translated-text");
-                
-//                 const start = performance.now();
-//                 //if it's cached and not a show more translation, use cached translation
-//                 if (cachedTranslation && !isShowMore) {
-//                     console.log("Translation from cache for: ", langDiv.textContent.substring(0, 100));
-//                     console.log("Cached translation: ", cachedTranslation);
-//                     span.textContent = `\n\nTranslation:\n${cachedTranslation}\nExecution time in seconds: ${(performance.now() - start) / 1000}`;
-//                 }
-//                 else {
-//                     const response = await chrome.runtime.sendMessage({
-//                         type: MESSAGE_TYPES.TRANSLATE_TEXT,
-//                         text: langDiv.textContent,
-//                         source: langDiv.getAttribute("lang"),
-//                         target: targetLanguage,
-//                     });
-
-//                     if (response.success) {
-//                         span.textContent = `\n\nTranslation:\n${response.translatedText}\nExecution time in seconds: ${(performance.now() - start) / 1000}`;
-//                         //add to cache
-//                         translationCache.set(key, response.translatedText);
-//                     }
-//                     else {
-//                         span.textContent = `\n\nTranslation:\nError ${response.status}: ${response.error}\nExecution time in seconds: ${(performance.now() - start) / 1000}`;
-//                     }
-                    
-//                 }
-//                 langDiv.appendChild(span);
-
-
-//             } catch (error) {
-//                 console.error("Error during translation node creation:", error);
-//             }
-//         }
-//     }
-// }
-
-async function createTranslatedNode2(langDiv, isShowMore = false) {
+async function createTranslatedNode(langDiv, isShowMore = false) {
     if (langDiv && !nativeLangs.includes(langDiv.getAttribute("lang"))) {
         //get extracted text
         try {
             const { textToTranslate, specialNodesInfo } = extractText(langDiv);
-            // const textToTranslateJoined = textToTranslate.join("");
-            // console.log("Text to translate: ", textToTranslate);
-
-            // console.log("Special nodes info: ", specialNodesInfo);
-            // //make cache key and check cache
-
-            // const key = createHash(textToTranslateJoined.substring(0, 100));
-            // let translatedText = translationCache.get(key);
 
             //create span
             const span = document.createElement("span");
             span.classList.add("css-1jxf684", "r-bcqeeo", "r-1ttztb7", "r-qvutc0", "r-poiln3", "translated-text");
             span.textContent = `\n\nTranslation:\n`;
-            // const start = performance.now();
+            const start = performance.now();
 
-            // if (!translatedText || isShowMore) {
-            //     //call api to get list of translations
-            //     const response = await chrome.runtime.sendMessage({
-            //         type: MESSAGE_TYPES.TRANSLATE_TEXT,
-            //         text: textToTranslate,
-            //         source: langDiv.getAttribute("lang"),
-            //         target: targetLanguage,
-            //     });
-
-            //     if (response.success) {
-            //         translatedText = response.translatedText;
-            //         console.log("Translated text after API call:", translatedText);
-            //         //add to cache
-            //         translationCache.set(key, translatedText);
-            //     }
-            //     else {
-            //         span.textContent = `\n\nTranslation:\nError ${response.status}: ${response.error}`;
-            //         langDiv.appendChild(span);
-            //         return;
-            //     }
-            // }
             const response = await chrome.runtime.sendMessage({
                 type: MESSAGE_TYPES.TRANSLATE_TEXT,
                 text: textToTranslate,
@@ -290,12 +210,11 @@ async function createTranslatedNode2(langDiv, isShowMore = false) {
                 return;
             }
 
-            // console.log("Translated text: ", response.translatedText);
             //loop over array of translated text
             for (let i = 0; i < response.translatedText.length; i++) {
                 // Handle special nodes
                 if (specialNodesInfo.has(i)) {
-                    // console.log("Handling special node at index: ", i);
+
                     const info = specialNodesInfo.get(i);
                     //if it's a IMG, just add the html to our span element
                     if (info.type === "img" || info.type === "spacing") {
@@ -303,7 +222,6 @@ async function createTranslatedNode2(langDiv, isShowMore = false) {
                         span.insertAdjacentHTML("beforeend", info.html);
                     }
                     else if (info.type === "link" || info.type === "text") {
-                        // console.log("Adding link/text node: ", info.html);
                         //if it's a link, we need to replace the text in the html with the translated text, then add to our span element
                         //link: tempdiv -> span -> a -> text node
                         //text: tempdiv -> span -> text
@@ -328,11 +246,8 @@ async function createTranslatedNode2(langDiv, isShowMore = false) {
                         span.append(node);
                     }
                 }
-                else {
-                    console.log("Adding regular text: ", response.translatedText[i]);
-                    span.append(response.translatedText[i]);
-                }
             }
+            span.append(`\nExecution time: ${(performance.now() - start) / 1000}`);
             langDiv.appendChild(span);
         } catch (error) {
             console.error("Error during translation node creation:", error);
@@ -347,37 +262,27 @@ function extractText(div) {
 
     function dfs(node) {
 
-        // if (node.nodeType === Node.TEXT_NODE) {
-        //     textToTranslate.push(node.textContent);
-        //     return;
-        // }
         if (node.nodeType === Node.ELEMENT_NODE) {
             //if span w/ a link
             if (node.classList.contains("r-18u37iz")) {
                 const linkNode = node.querySelector("a");
                 if (linkNode) {
-                    // const sub = `[[__LINK${subIndex}__]]`;
                     textToTranslate.push(linkNode.textContent);
+
                     //store index
                     const specialNodeInfo = {
-                        // sub: sub,
                         html: node.outerHTML,
                         text: linkNode.textContent,
                         type: "link"
                     };
+
                     specialNodesInfo.set(textToTranslate.length - 1, specialNodeInfo);
-                    //if linkNode has more than 1 child, it has text and img
-                    // if (linkNode.childNodes.length > 1) {
-                    //     specialNodeInfo
-                    // }
                     return;
                 }
             }
             //if img link, it's an emoji
             else if (node.tagName === "IMG") {
-                // if (node.alt) {
-                //     textToTranslate.push(node.alt);
-                // }
+
                 textToTranslate.push("");
                 const specialNodeInfo = {
                     html: node.outerHTML,
@@ -407,12 +312,7 @@ function extractText(div) {
                 };
                 specialNodesInfo.set(textToTranslate.length - 1, specialNodeInfo);
             }
-
-            // Array.from(node.childNodes).forEach(child => {
-            //     dfs(child);
-            // });
         }
-
     }
 
     //start dfs
@@ -425,17 +325,3 @@ function extractText(div) {
         specialNodesInfo
     };
 }
-
-function test(tweetTextContainer) {
-    // const tweetTextContainer = document.querySelector('[data-testid="tweetText"]');
-    // console.log("Tweet text container: ", tweetTextContainer);
-    // console.log("hi");
-    const { textToTranslate, specialNodesInfo } = extractText(tweetTextContainer);
-    console.log("Text to translate: ", textToTranslate);
-    console.log("Special nodes info: ", specialNodesInfo);
-    console.log("Reconstructed text: ", textToTranslate.join(""));
-}
-
-// document.addEventListener("DOMContentLoaded", () => {
-//     test();
-// });
