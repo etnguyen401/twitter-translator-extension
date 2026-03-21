@@ -303,7 +303,7 @@ async function createTranslatedNode2(langDiv, isShowMore = false) {
             const span = document.createElement("span");
             span.classList.add("css-1jxf684", "r-bcqeeo", "r-1ttztb7", "r-qvutc0", "r-poiln3", "translated-text");
             span.textContent = `\n\nTranslation:\n`;
-            // const start = performance.now();
+            const start = performance.now();
 
             if (!translatedText || isShowMore) {
                 //call api to get list of translations
@@ -370,6 +370,7 @@ async function createTranslatedNode2(langDiv, isShowMore = false) {
                     span.append(translatedText[i]);
                 }
             }
+            span.append(`\nExecution time: ${(performance.now() - start) / 1000}`);
             langDiv.appendChild(span);
         } catch (error) {
             console.error("Error during translation node creation:", error);
