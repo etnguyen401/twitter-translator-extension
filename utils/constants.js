@@ -8,7 +8,7 @@ export const STORAGE_KEYS = {
 // default preferences
 export const DEFAULT_PREFERENCES = {
     [STORAGE_KEYS.TARGET_LANGUAGE]: "English (en)",
-    [STORAGE_KEYS.TEXT_COLOUR]: "#4606f5",
+    [STORAGE_KEYS.TEXT_COLOUR]: "#c3dcc1",
     [STORAGE_KEYS.TARGET_FONT]: "Default"
 };
 

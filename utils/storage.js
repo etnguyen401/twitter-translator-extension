@@ -11,8 +11,12 @@ export const Storage = {
 
     async getAll() {
         return new Promise((resolve) => {
-            chrome.storage.sync.get(null, (data) => {
-                resolve(data ?? DEFAULT_PREFERENCES);
+            chrome.storage.sync.get(Object.keys(DEFAULT_PREFERENCES), (data) => {
+                const res = Object.keys(DEFAULT_PREFERENCES).reduce((acc, key) => {
+                    acc[key] = data[key] ?? DEFAULT_PREFERENCES[key];
+                    return acc;
+                }, {});
+                resolve(res);
             })
         })
     },

@@ -86,6 +86,10 @@ function applyTextColour(colour) {
         oldStyle.remove();
     }
 
+    if (colour === "") {
+        return;
+    }
+    
     //make style element and add css rules for tweets
     const style = document.createElement("style");
     style.id = "translation-text-colour";
