@@ -55,14 +55,26 @@ class LRUCache {
 const translationCache = new LRUCache(1000);
 
 import { MESSAGE_TYPES } from "../utils/constants.js";
+
 chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
     if (changeInfo.status === "complete") {
-        chrome.tabs.sendMessage(tabId, {
-            url: tab.url,
-            type: MESSAGE_TYPES.URL_CHANGE
-        });
+        chrome.tabs.sendMessage(
+            tabId,
+            {
+                url: tab.url,
+                type: MESSAGE_TYPES.URL_CHANGE
+            },
+            () => {
+                if (chrome.runtime.lastError) {
+                    console.log('Could not send URL_CHANGE msg to tab', tabId, ':', chrome.runtime.lastError.message);
+                } else {
+                    console.log('URL_CHANGE sent successfully to tab', tabId);
+                }
+            }
+        );
     }
 });
+
 
 chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
     if (msg.type === MESSAGE_TYPES.TRANSLATE_TEXT) {
@@ -119,17 +131,13 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
             })();
         }
         else {
-            console.log("Cache hit for key: ", key);
             sendResponse({
                 success: true,
                 originalText: msg.text,
                 translatedText: translatedText
-            })
+            });
         }
         return true;
     }
-
-    
-    
-    
 });
+

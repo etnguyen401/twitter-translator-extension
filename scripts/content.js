@@ -89,7 +89,7 @@ function applyTextColour(colour) {
     if (colour === "") {
         return;
     }
-    
+
     //make style element and add css rules for tweets
     const style = document.createElement("style");
     style.id = "translation-text-colour";
@@ -198,7 +198,7 @@ async function createTranslatedNode(langDiv, isShowMore = false) {
             const span = document.createElement("span");
             span.classList.add("css-1jxf684", "r-bcqeeo", "r-1ttztb7", "r-qvutc0", "r-poiln3", "translated-text");
             span.textContent = `\n\nTranslation:\n`;
-
+            
             const response = await chrome.runtime.sendMessage({
                 type: MESSAGE_TYPES.TRANSLATE_TEXT,
                 text: textToTranslate,
@@ -206,6 +206,7 @@ async function createTranslatedNode(langDiv, isShowMore = false) {
                 source: langDiv.getAttribute("lang"),
                 target: targetLanguage,
             });
+            
 
             if (!response.success) {
                 span.textContent = `\n\nTranslation:\nError ${response.status}: ${response.error}`;
