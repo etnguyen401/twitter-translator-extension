@@ -54,14 +54,81 @@ class LRUCache {
 //create cache
 const translationCache = new LRUCache(1000);
 
+
 import { MESSAGE_TYPES } from "../utils/constants.js";
 
-chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
-    if (changeInfo.status === "complete") {
+
+const prevURLMap = new Map();
+const ignoredPathPrefixes = [
+    "/compose/post",
+    "/messages/compose",
+    "/i/verified-get-verified",
+    "/i/safety/report_story_start"
+]
+
+function isIgnoredPath(pathname) {
+    return ignoredPathPrefixes.some((prefix) => pathname.startsWith(prefix));
+}
+
+function getBaseURL(rawURL, prevURL) {
+    try {
+        const url = new URL(rawURL);
+
+        //check if pathname starts with any of the ignored pathnames
+        if (isIgnoredPath(url.pathname)) {
+            console.log("Ignoring URL due to ignored path prefix:", rawURL);
+            return null;
+        }
+
+        const checkAnalytics = /\/status\/(\d+)\/analytics(\/.*)?$/.test(url.pathname);
+        //if it's analytics, check if prev URL was media, if it is, we need to retarget
+        //else, return the prev URL, since we don't want to retarget to the analytics page 
+        //if the user is not coming from media
+        if (checkAnalytics) {
+            if (prevURL && prevURL.endsWith("/media")) {
+                console.log("Retargeting analytics URL to media since prev URL is media:", rawURL);
+                return rawURL;
+            }
+            else {
+                console.log("Ignoring analytics URL since prev URL is not media:", rawURL);
+                return null;
+            }
+        }
+
+        //adjust the URL if the URL is a photo / video album is being opened
+        let newPath = url.pathname.replace(
+            /\/status\/(\d+)\/(photo|video)(\/.*)?$/,
+            "/status/$1/media"
+        );
+        
+        return `${url.origin}${newPath}${url.search}`;
+            
+    }
+    catch {
+        return null;
+    }
+}
+
+function notifyTab(tabId, url) {
+    if (!url) return;
+
+    const prevURL = prevURLMap.get(tabId);
+
+    const baseURL = getBaseURL(url, prevURL);
+
+    if (!baseURL) return;
+    
+    if (prevURL === baseURL) {
+        console.log("No URL change detected for tabId:", tabId, "URL:", url);
+        return;
+    }
+    else {
+        console.log("Detected URL change for tabId:", tabId, "New URL:", url);
+        prevURLMap.set(tabId, baseURL);
         chrome.tabs.sendMessage(
             tabId,
             {
-                url: tab.url,
+                url: url,
                 type: MESSAGE_TYPES.URL_CHANGE
             },
             () => {
@@ -73,8 +140,32 @@ chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
             }
         );
     }
+}
+
+chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
+    if (changeInfo.status === "complete") {
+        console.log("Detected reload for tabId:", tabId, "New URL:", tab.url);
+        notifyTab(tabId, tab.url);
+    }
 });
 
+// chrome.webNavigation.onHistoryStateUpdated.addListener((details) => {
+//     console.log("Detected onHistoryStateUpdated change for tabId:", details.tabId, "New URL:", details.url);
+//     if (details.url) {
+//         notifyTab(details.tabId, details.url);
+//     }
+//     else {
+//         console.log("No URL found in details for onHistoryStateUpdated change:", details.tabId);
+//     }
+// });
+
+//cleanup 
+chrome.tabs.onRemoved.addListener((tabId, removeInfo) => {
+    if (prevURLMap.has(tabId)) {
+        prevURLMap.delete(tabId);
+        console.log("Removed tabId from prevURLMap:", tabId);
+    }
+});
 
 chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
     if (msg.type === MESSAGE_TYPES.TRANSLATE_TEXT) {
