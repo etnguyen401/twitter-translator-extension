@@ -57,7 +57,6 @@ const translationCache = new LRUCache(1000);
 
 import { MESSAGE_TYPES } from "../utils/constants.js";
 
-
 const prevURLMap = new Map();
 const ignoredPathPrefixes = [
     "/compose/post",
@@ -109,6 +108,22 @@ function getBaseURL(rawURL, prevURL) {
     }
 }
 
+function sendURLChangeMessage(tabId) {
+    chrome.tabs.sendMessage(
+        tabId,
+        {
+            type: MESSAGE_TYPES.URL_CHANGE,
+        }, 
+        () => {
+            if (chrome.runtime.lastError) {
+                console.log('Could not send URL_CHANGE msg to tab', tabId, ':', chrome.runtime.lastError.message);
+            } else {
+                console.log('URL_CHANGE sent successfully to tab', tabId);
+            }
+        }
+    );
+}
+
 function notifyTab(tabId, url) {
     if (!url) return;
 
@@ -125,39 +140,20 @@ function notifyTab(tabId, url) {
     else {
         console.log("Detected URL change for tabId:", tabId, "New URL:", url);
         prevURLMap.set(tabId, baseURL);
-        chrome.tabs.sendMessage(
-            tabId,
-            {
-                url: url,
-                type: MESSAGE_TYPES.URL_CHANGE
-            },
-            () => {
-                if (chrome.runtime.lastError) {
-                    console.log('Could not send URL_CHANGE msg to tab', tabId, ':', chrome.runtime.lastError.message);
-                } else {
-                    console.log('URL_CHANGE sent successfully to tab', tabId);
-                }
-            }
-        );
+        sendURLChangeMessage(tabId);
     }
 }
 
-chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
-    if (changeInfo.status === "complete") {
-        console.log("Detected reload for tabId:", tabId, "New URL:", tab.url);
-        notifyTab(tabId, tab.url);
+chrome.webNavigation.onHistoryStateUpdated.addListener((details) => {
+    if (details.frameId !== 0) return; 
+    console.log("Detected onHistoryStateUpdated change for tabId:", details.tabId, "New URL:", details.url);
+    if (details.url) {
+        notifyTab(details.tabId, details.url);
+    }
+    else {
+        console.log("No URL found in details for onHistoryStateUpdated change:", details.tabId);
     }
 });
-
-// chrome.webNavigation.onHistoryStateUpdated.addListener((details) => {
-//     console.log("Detected onHistoryStateUpdated change for tabId:", details.tabId, "New URL:", details.url);
-//     if (details.url) {
-//         notifyTab(details.tabId, details.url);
-//     }
-//     else {
-//         console.log("No URL found in details for onHistoryStateUpdated change:", details.tabId);
-//     }
-// });
 
 //cleanup 
 chrome.tabs.onRemoved.addListener((tabId, removeInfo) => {

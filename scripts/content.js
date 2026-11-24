@@ -55,6 +55,8 @@ window.addEventListener("load", () => {
                 break;
         }
     });
+
+    initialPageSetup();
 });
 
 function applyFont(font) {
